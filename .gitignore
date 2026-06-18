@@ -1,0 +1,25 @@
+# 하네스 중간 산출물 (감사 추적용 로컬 보존, 저장소에는 올리지 않음)
+_workspace/
+_workspace_*/
+
+# Obsidian 작업 폴더
+vault/.obsidian/workspace*.json
+.obsidian/workspace*.json
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# GEE / 인증 비밀 (절대 커밋 금지)
+*.pem
+*credentials*.json
+service-account*.json
+.env
+
+# OS
+.DS_Store
+Thumbs.db
