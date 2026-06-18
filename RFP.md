@@ -8,9 +8,11 @@
 요구사항
 - 실습 위주
 
-
-참고
-- https://github.com/taehojo/vibecoding
+실습주제
 - C:\dev\dkchangedetection
 - C:\dev\dkidi
+
+
+벤치마킹
+- https://github.com/taehojo/vibecoding
 
