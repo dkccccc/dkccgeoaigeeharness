@@ -44,85 +44,92 @@ tags: [장/6, 주제/claude-code, 난이도/입문]
 ## 실습 — 배포와 공유
 
 > [!info] 이 실습을 마치면
-> 노트북에서 셀로만 돌리던 변화탐지가 **남이 브라우저에서 클릭해 쓰는 웹앱**이 되고, **링크 하나로 공유**할 수 있게 됩니다. 마지막으로 **MCP**를 맛봅니다. 약 35분.
-> **선행:** [[5-agent-team|5장]]까지 왔다면 충분합니다. 핵심은 [[4-service|4장]] `run_change_detection`이 동작하는 것 — 이 앱은 그 함수를 화면으로 감쌀 뿐입니다.
+> [[5-agent-team|5장]] 앱(한 지역 + 여러 지역 분석)이 **남이 브라우저에서 클릭해 쓰고, 링크 하나로 공유되는** 웹앱이 됩니다. 마지막으로 **MCP**를 맛봅니다. 약 35분.
+> **선행:** [[5-agent-team|5장]]까지 왔다면 충분합니다. 6장은 **새 기능을 더하지 않습니다** — 같은 앱을 클라우드에서도 돌게 인증만 손보고, 세상에 내보냅니다.
 
-5장까지는 여러분(또는 에이전트 팀)이 **코드를 직접 돌려** 결과를 봤습니다. 6장은 같은 변화탐지를 **남이 클릭해서 쓰는 웹앱**으로 바꿉니다 — 동료에게 "이 노트북 셀을 순서대로 실행하고 인증하고..." 대신 **링크 하나**를 보내면 끝나도록.
+5장까지 만든 앱은 **여러분 컴퓨터 안에서만** 돕니다. 켜려면 매번 터미널에 명령을 쳐야 하고, 주소도 `localhost`(나만 닿는 내부 주소)뿐입니다. 6장은 같은 앱을 **남이 클릭해서 쓰는 공개 링크**로 내보냅니다 — 동료에게 "이거 설치하고 인증하고 실행하고..." 대신 **링크 하나**를 보내면 끝나도록.
 
-초급자에게 가장 쉬운 길은 **Streamlit**입니다. 파이썬 한 파일(`app.py`)에 `st.button`, `st.metric` 같은 줄을 적으면 그게 화면이 됩니다. 변화탐지 로직은 **하나도 새로 짜지 않습니다** — [[4-service|4장]] `run_change_detection`을 그대로 가져다 씁니다. 리듬도 그대로 **뼈대 → 기능 → 점검**입니다.
+코드를 새로 짜는 일은 거의 없습니다. [[4-service|4장]] `run_change_detection`(한 지역)과 [[5-agent-team|5장]] `batch_change_detection`(여러 지역)을 **그대로** 쓰고, 딱 두 가지만 준비합니다 — ① 클라우드가 설치할 패키지 목록(`requirements.txt`)과 ② 클라우드용 인증(서비스 계정). 리듬은 그대로 **준비 → 배포 → 점검**입니다.
 
-### 단계 1 — 뼈대: Streamlit 웹앱 (프롬프트 6-1)
+### 단계 1 — 뼈대: 배포 준비 (프롬프트 6-1)
 
-[[4-service|4장]] 변화탐지 서비스를 **입력칸 + 버튼 + 결과 화면**으로 감쌉니다. 지역·기간·구름값을 화면에서 받고, 버튼을 누르면 변화 지도와 요약 카드를 보여줍니다. 디자인은 신경 쓰지 말고 **로컬에서 한 번 뜨는지**부터 봅니다.
+배포하려면 두 가지를 미리 챙겨야 합니다. **(1) `requirements.txt`** — 클라우드 서버는 빈 컴퓨터라, 어떤 패키지를 깔아야 하는지 적힌 목록이 있어야 앱이 뜹니다. **(2) 클라우드용 인증** — 클라우드에는 `earthengine authenticate` 의 **브라우저 로그인 창이 없습니다.** 그래서 사람이 로그인하는 대신 **서비스 계정**(robot 계정)의 열쇠로 조용히 인증하게 합니다. 같은 코드가 로컬에서도 클라우드에서도 돌도록, **인증을 자동으로 갈라** 줍니다.
 
 > [!quote] 6-1
-> 좋아, 4장에서 만든 `run_change_detection` 변화탐지 함수가 잘 돌아가. 이제 이걸 동료가 브라우저에서 클릭해 쓰는 웹앱으로 만들고 싶어. Streamlit으로, 왼쪽 사이드바에서 중심 좌표·반경(km)·이전 기간·이후 기간·구름 임계값을 입력받고, [분석 실행] 버튼을 누르면 `run_change_detection`을 호출해서 변화 지도와 요약 통계(면적·평균 변화량·감소/증가 비율)를 보여줘. 지도는 geemap을 streamlit 안에 임베드해줘. 코드는 한 파일 `app.py`로, 한국어 주석으로.
+> 좋아, 5장 앱(한 지역 + 여러 지역 분석)이 로컬에서 잘 돌아가. 이제 이걸 배포할 수 있게 준비하고 싶어. 두 가지를 해줘. 첫째, 필요한 패키지를 담은 `requirements.txt`를 만들어줘(streamlit, geemap, earthengine-api). 둘째, Earth Engine 인증을 클라우드에서도 되게 고쳐줘 — `st.secrets`에 서비스 계정 JSON이 있으면 `ee.ServiceAccountCredentials`로 초기화하고, 없으면 로컬처럼 `ee.Initialize()`를 쓰도록 try/except로 분기해줘. 분석 로직(`run_change_detection`·`batch_change_detection`)은 그대로 두고, 왜 이렇게 갈리는지 한국어 주석으로 설명해줘.
 
-설치하고 로컬에서 띄웁니다.
+로컬에서 먼저 그대로 도는지 확인합니다(인증 분기를 더했어도 로컬 동작은 똑같아야 합니다).
 
 ```bash
-pip install streamlit geemap earthengine-api
+pip install -r requirements.txt
 earthengine authenticate     # 처음 한 번 (브라우저로 로그인)
 streamlit run app.py
 ```
 
 > [!success] 확인
-> `streamlit run app.py`를 하면 터미널에 아래처럼 주소가 뜨고 브라우저가 자동으로 열립니다.
+> 폴더에 **`requirements.txt`** 가 생기고 안에 `streamlit` · `geemap` · `earthengine-api` 세 줄이 있으면 됩니다. 그리고 `streamlit run app.py` 가 **5장과 똑같이** 떠야 합니다 — 인증 분기를 더했어도 로컬에선 기존 토큰으로 조용히 초기화되므로, 화면(한 지역 탭 + 여러 지역 탭)은 그대로 보이면 성공입니다.
 > ```
 >   You can now view your Streamlit app in your browser.
 >   Local URL: http://localhost:8501
 > ```
-> 왼쪽에 입력칸과 **[분석 실행]** 버튼이 보이고, 버튼을 누르면 잠시 뒤 **요약 카드 4개 + 빨강~파랑 변화 지도**가 뜨면 성공입니다. 입력값(지역·기간)만 바꿔 다시 눌러도 다시 그려지면 진짜 '웹앱'이 된 것입니다.
 
-### 단계 2 — 기능: 배포해 링크 공유 (프롬프트 6-2)
+### 단계 2 — 기능: Streamlit Cloud 에 배포해 링크 공유 (프롬프트 6-2)
 
-내 컴퓨터에서만 도는 `localhost`는 남이 못 엽니다. 이 앱을 **Streamlit Community Cloud**(무료)에 올려 **누구나 열 수 있는 링크**로 만듭니다. GitHub에 올리고 → 연결하면 끝입니다.
+준비가 끝났으니 이제 **올립니다.** `app.py` 와 `requirements.txt` 를 GitHub에 올리고 → **Streamlit Community Cloud**(무료)에 연결하면 **누구나 열 수 있는 링크**가 생깁니다. 그다음 클라우드용 인증(서비스 계정)을 **Secrets** 에 넣습니다.
 
 > [!quote] 6-2
-> 이 Streamlit 앱을 무료로 배포해서 링크로 공유하고 싶어. Streamlit Community Cloud에 올리는 절차를 처음부터 알려줘. GitHub에 뭘 올려야 하는지(`app.py` 말고 `requirements.txt`도 필요하지?), 그리고 클라우드에는 브라우저 인증 창이 없으니까 Earth Engine 인증을 서비스 계정으로 어떻게 넣는지도 단계별로 설명해줘.
+> 이제 이 앱을 무료로 배포해서 링크로 공유하고 싶어. Streamlit Community Cloud에 올리는 절차를 처음부터 단계별로 알려줘. GitHub 저장소에 뭘 올려야 하는지(`app.py` + `requirements.txt`), share.streamlit.io에서 어떻게 연결하는지, 그리고 6-1에서 만든 서비스 계정 인증이 동작하도록 Google Cloud에서 서비스 계정 키를 발급해 Earth Engine에 등록하고 그 JSON을 Streamlit **Secrets**에 `[gee_service_account]`로 넣는 방법까지 짚어줘.
 
 배포 순서(요약):
 
 ```text
 1) app.py 와 requirements.txt 를 GitHub 공개 저장소에 올린다
-     requirements.txt:
-       streamlit
-       geemap
-       earthengine-api
 2) share.streamlit.io 에 GitHub 계정으로 로그인 → New app
-3) 저장소·브랜치·app.py 선택 → Deploy
-4) 1~2분 뒤 https://...streamlit.app 링크 생성
+3) 저장소·브랜치·app.py 선택 → Deploy  →  1~2분 뒤 https://...streamlit.app 링크 생성
+4) (클라우드 인증) Google Cloud 에서 서비스 계정 키(JSON) 발급
+     → 그 계정 이메일을 Earth Engine 에 사용자로 등록
+     → 앱 화면 ⋮ → Settings → Secrets 에 [gee_service_account] 로 JSON 붙여넣기
+```
+
+Secrets 에는 이렇게 넣습니다(앱의 `init_ee()` 가 이 이름을 찾습니다):
+
+```toml
+[gee_service_account]
+type = "service_account"
+project_id = "내-프로젝트-아이디"
+private_key = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+client_email = "내서비스계정@내-프로젝트.iam.gserviceaccount.com"
 ```
 
 > [!success] 확인
-> 배포가 끝나면 `https://<내앱이름>.streamlit.app` 같은 **공개 링크**가 생깁니다. 그 링크를 **휴대폰**이나 **다른 브라우저(시크릿 창)**에서 열어, 내 컴퓨터가 아닌 곳에서도 입력칸과 버튼이 보이면 성공입니다. (Earth Engine 인증까지 잘 됐다면 분석 결과도 뜹니다 — 인증이 막히면 아래 '막히면'의 서비스 계정 항목을 보세요.)
+> 배포가 끝나면 `https://<내앱이름>.streamlit.app` 같은 **공개 링크**가 생깁니다. 그 링크를 **휴대폰**이나 **다른 브라우저(시크릿 창)**에서 열어, 내 컴퓨터가 아닌 곳에서도 입력칸과 버튼이 보이면 성공입니다. Secrets 의 서비스 계정까지 잘 들어갔다면 **분석 결과(변화 지도·지역별 표)** 도 그대로 뜹니다 — 인증이 막히면 아래 '막히면'의 서비스 계정 항목을 보세요.
 
-### 단계 3 — 점검: MCP 맛보기 + 배포 확인 (프롬프트 6-3)
+### 단계 3 — 점검: MCP 맛보기 + 배포 링크 확인 (프롬프트 6-3)
 
 마지막으로 위에서 본 **MCP**를 가볍게 맛봅니다. 지금까지는 Claude Code가 코드를 *써* 줬다면, MCP는 Claude가 **외부 도구·데이터에 직접 손을 뻗게** 해주는 약속입니다 — 예를 들어 "내 파일을 읽어줘"를 Claude가 직접 하게 합니다. 깊이 들어가지 말고, **아주 작은 연결 예**만 봅니다.
 
 > [!quote] 6-3
-> MCP(Model Context Protocol)가 뭔지 초보자 눈높이로 짧게 설명해줘. 그리고 내 변화탐지 결과 파일들이 든 폴더를 Claude Code가 직접 읽을 수 있게, 가장 간단한 MCP 서버(예: filesystem) 하나를 연결하는 방법을 알려줘. 설정 파일에 뭘 적어야 하는지 한 줄씩 짚어주고, 연결이 됐는지 확인하는 법도 알려줘.
+> MCP(Model Context Protocol)가 뭔지 초보자 눈높이로 짧게 설명해줘. 그리고 내 변화탐지 결과 파일들(여러 지역 분석에서 내려받은 보고서 JSON)이 든 폴더를 Claude Code가 직접 읽을 수 있게, 가장 간단한 MCP 서버(예: filesystem) 하나를 연결하는 방법을 알려줘. 설정 파일에 뭘 적어야 하는지 한 줄씩 짚어주고, 연결이 됐는지 확인하는 법도 알려줘.
 
 > [!success] 확인
-> MCP는 **"한 번 연결해 두면 Claude가 그 도구를 계속 쓸 수 있게"** 하는 표준 꽂이(어댑터)라고 이해하면 됩니다. 예컨대 filesystem MCP를 붙이면, [[4-service|4장에서 내보낸]] `change_*.csv`들이 든 폴더를 가리키며 *"이 폴더의 변화량이 가장 큰 지역을 정리해줘"*라고 자연어로 시킬 수 있습니다 — 파일 경로를 일일이 붙여넣지 않아도 됩니다.
+> MCP는 **"한 번 연결해 두면 Claude가 그 도구를 계속 쓸 수 있게"** 하는 표준 꽂이(어댑터)라고 이해하면 됩니다. 예컨대 filesystem MCP를 붙이면, 이 앱의 **여러 지역 비교** 탭에서 내려받은 보고서 JSON 들이 든 폴더를 가리키며 *"이 폴더에서 변화량이 가장 큰 지역을 정리해줘"*라고 자연어로 시킬 수 있습니다 — 파일 경로를 일일이 붙여넣지 않아도 됩니다.
 > 연결 확인: Claude Code에서 `/mcp`를 치면 붙은 서버 목록이 뜹니다. 거기에 방금 연결한 이름이 보이면 성공입니다.
 >
 > **여기서는 "이런 게 있다"까지면 충분합니다.** MCP는 이 교재 이후, 여러분 연구 도구(GEE 자산·논문 DB·내부 파일)를 Claude에 붙일 때 다시 만나게 됩니다.
 
-배포 마지막 점검 — 만든 숫자를 그대로 믿지 않는 습관은 여기서도 같습니다. 배포된 앱에서 **아는 지역**(예: 최근 대규모 공사·산불 지역)을 넣어, 변화 지도의 빨강(감소)이 실제 그 자리에 뜨는지 눈으로 대보세요. ([[0-first-vibe-coding|할루시네이션 검증]])
+그리고 **배포된 링크를 마지막으로 점검**합니다 — 만든 숫자를 그대로 믿지 않는 습관은 여기서도 같습니다. 배포된 앱에서 **아는 지역**(예: 최근 대규모 공사·산불 지역)을 넣어, 변화 지도의 빨강(감소)이 실제 그 자리에 뜨는지 눈으로 대보세요. ([[0-first-vibe-coding|할루시네이션 검증]])
 
 ### 막히면
 
 > [!warning] 자주 나는 오류
 > - **지도가 빈 회색** → 일반 `geemap`을 import 한 것. 웹앱에서는 `import geemap.foliumap as geemap` + `m.to_streamlit()`이어야 지도가 뜹니다.
 > - **로컬에서 `EEException: not initialized`** → `earthengine authenticate`를 안 한 것. 터미널에서 먼저 인증하세요.
-> - **`streamlit: command not found`** → 설치가 안 된 것. `pip install streamlit` 후 다시.
-> - **클라우드에서 인증이 안 됨** → 클라우드엔 브라우저 인증 창이 없습니다. **서비스 계정** 토큰을 앱 설정 → **Secrets**에 넣어 `ee.Initialize()`가 조용히 인증하게 하세요. (Google Cloud에서 서비스 계정 키 발급 → Earth Engine에 등록 → Secrets에 붙여넣기) 처음엔 **로컬 `streamlit run`**으로 충분히 확인한 뒤 공유가 필요할 때만 클라우드로 올리세요.
+> - **`streamlit: command not found`** → 설치가 안 된 것. `pip install -r requirements.txt` 후 다시.
+> - **클라우드에서 인증이 안 됨** → 클라우드엔 브라우저 인증 창이 없습니다. **서비스 계정** JSON을 앱 설정 → **Secrets**에 `[gee_service_account]`로 넣어야 합니다. (Google Cloud에서 서비스 계정 키 발급 → 그 계정 이메일을 Earth Engine에 사용자로 등록 → Secrets에 붙여넣기) `private_key`의 `\n`을 여러 줄로 풀면 실패하니 그대로 두세요. 처음엔 **로컬 `streamlit run`**으로 충분히 확인한 뒤 공유가 필요할 때 클라우드로 올리세요.
 > - **클라우드 배포가 `ModuleNotFoundError`** → `requirements.txt`에 패키지를 빠뜨린 것. `streamlit`·`geemap`·`earthengine-api` 세 줄을 확인하세요.
 > - **결과가 계속 비어 있음** → 그 기간에 맑은 영상이 없는 것. [[1-prompts|구름 임계값]]을 30~40으로 올리거나 반경을 줄이세요.
 > - **`/mcp`에 아무것도 안 뜸** → 설정 파일 경로·JSON 형식이 틀렸을 수 있음. Claude Code를 껐다 켠 뒤 다시 `/mcp`를 확인하세요.
-> - 완성 코드는 `datawa_study06/app.py` 참고.
+> - 완성 코드는 `datawa_study06/app.py`, 배포 절차는 `datawa_study06/README.md` 참고.
 
 ## 다음
 
