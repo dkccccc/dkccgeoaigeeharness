@@ -21,7 +21,7 @@ tags: [유형/실습, 난이도/입문]
 세 가지를 준비합니다:
 
 1. **Claude Code** — 우리의 AI 개발 파트너 → **[[claude-code-setup|설치·로그인 안내]]** (가장 먼저, 유료 구독 필요)
-2. **Python + geemap** — 위성영상 다루기 (저장소 `설치가이드/README.md`)
+2. **Python + Streamlit + geemap** — 위성영상 웹앱 만들기 (저장소 `설치가이드/README.md`)
 3. **Google Earth Engine 계정** — 위성영상 창고 열쇠 (저장소 `설치가이드/README.md`)
 
 > [!tip] 설치가 막히면
