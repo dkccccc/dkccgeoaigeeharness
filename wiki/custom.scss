@@ -1,0 +1,7 @@
+// Quartz 접이식 콜아웃 수정
+// 기본 Quartz는 .callout-content 의 :first-child 만 height:0 으로 접어,
+// 단락이 여러 개인 콜아웃은 '첫 단락만' 접히는 문제가 있다.
+// → 접힌 상태에서는 내용 '전체'를 숨긴다.
+.callout.is-collapsed > .callout-content {
+  display: none;
+}
