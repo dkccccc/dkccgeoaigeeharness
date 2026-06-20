@@ -2,9 +2,9 @@
 _workspace/
 _workspace_*/
 
-# Obsidian 작업 폴더
-vault/.obsidian/workspace*.json
-.obsidian/workspace*.json
+# Obsidian 편집기 상태 (교재 내용 아님 — 커밋하지 않음)
+.obsidian/
+vault/.obsidian/
 
 # Python
 __pycache__/

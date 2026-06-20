@@ -1,0 +1,79 @@
+name: Deploy Wiki (Quartz → GitHub Pages)
+
+# vault/ 의 Obsidian 노트를 Quartz로 빌드해 GitHub Pages에 온라인 위키로 배포한다.
+# 빌드는 전부 GitHub 클라우드에서 일어난다 — 사용자 PC에 Node 설치가 필요 없다.
+# (최초 1회만 저장소 Settings → Pages → Source 를 "GitHub Actions" 로 바꾸면 된다.)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "vault/**"
+      - "wiki/**"
+      - ".github/workflows/deploy-wiki.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 교재 저장소 체크아웃
+        uses: actions/checkout@v4
+        with:
+          path: repo
+          fetch-depth: 0
+
+      - name: Quartz 받기 (v4.5.2 고정)
+        uses: actions/checkout@v4
+        with:
+          repository: jackyzha0/quartz
+          ref: v4.5.2
+          path: quartz
+
+      - name: Node 설치
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 콘텐츠 준비 (vault → Quartz content)
+        run: |
+          rm -rf quartz/content
+          mkdir -p quartz/content
+          cp -r repo/vault/. quartz/content/
+          # 홈(00-홈)을 사이트 첫 화면(index)으로도 복사
+          if [ -f quartz/content/00-홈.md ]; then
+            cp quartz/content/00-홈.md quartz/content/index.md
+          fi
+          # 우리 교재용 설정으로 교체
+          cp repo/wiki/quartz.config.ts quartz/quartz.config.ts
+
+      - name: 설치 & 빌드
+        working-directory: quartz
+        run: |
+          npm ci
+          npx quartz build
+
+      - name: Pages 아티팩트 업로드
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: quartz/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages 배포
+        id: deployment
+        uses: actions/deploy-pages@v4
