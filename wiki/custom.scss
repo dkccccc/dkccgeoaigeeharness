@@ -25,3 +25,10 @@
       / 320px auto;
   }
 }
+
+// (3) 본문 첫 제목(H1)이 상단 제목(ArticleTitle = frontmatter title)과 중복.
+// 옵시디언에선 본문 H1을 그대로 보여주려고 마크다운은 두고, 웹에서만 본문 H1을 숨긴다.
+// (.article-title 은 <article> 밖이라 영향 없음)
+.center article h1 {
+  display: none;
+}
