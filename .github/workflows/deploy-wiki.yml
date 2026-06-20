@@ -49,9 +49,9 @@ jobs:
           rm -rf quartz/content
           mkdir -p quartz/content
           cp -r repo/vault/. quartz/content/
-          # 홈(00-홈)을 사이트 첫 화면(index)으로도 복사
-          if [ -f quartz/content/00-홈.md ]; then
-            cp quartz/content/00-홈.md quartz/content/index.md
+          # 홈(00-home)을 사이트 첫 화면(index)으로도 복사
+          if [ -f quartz/content/00-home.md ]; then
+            cp quartz/content/00-home.md quartz/content/index.md
           fi
           # 우리 교재용 설정으로 교체
           cp repo/wiki/quartz.config.ts quartz/quartz.config.ts

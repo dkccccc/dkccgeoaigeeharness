@@ -19,7 +19,7 @@ AI 개발 파트너입니다. 일상 언어를 코드로 바꿔줍니다.
 
 1. [obsidian.md](https://obsidian.md) 에서 설치
 2. **"Open folder as vault"** → 이 저장소의 `vault/` 폴더 선택
-3. `00-홈.md` 노트를 열면 시작입니다
+3. `00-home.md` 노트를 열면 시작입니다
 
 ## 3. Python + geemap (GEE 실습)
 

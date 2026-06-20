@@ -15,7 +15,7 @@
 이 교재의 본문은 **Obsidian 위키**입니다. 노트끼리 `[[위키링크]]`로 연결돼 있어, 실습 중 모르는 개념을 클릭 한 번으로 펼쳐볼 수 있습니다.
 
 1. [Obsidian](https://obsidian.md) 설치 → `vault/` 폴더를 볼트로 열기
-2. `vault/00-홈.md` 에서 시작 (전체 지도)
+2. `vault/00-home.md` 에서 시작 (전체 지도)
 3. 장별 실행 코드는 `datawa_study00/` ~ `datawa_study06/` 에 있습니다
 4. 모든 프롬프트는 [PROMPTS.md](./PROMPTS.md) 에 모여 있습니다 — 복붙해서 바로 쓰세요
 
