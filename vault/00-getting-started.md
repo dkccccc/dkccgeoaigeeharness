@@ -18,11 +18,11 @@ tags: [유형/실습, 난이도/입문]
 
 ## 2. 만들 준비 — 도구 설치
 
-설치는 저장소의 **`설치가이드/README.md`** 에 단계별로 있습니다. 요약하면:
+세 가지를 준비합니다:
 
-1. **Claude Code** — 우리의 AI 개발 파트너
-2. **Python + geemap** — 위성영상 다루기
-3. **Google Earth Engine 계정** — 위성영상 창고 열쇠
+1. **Claude Code** — 우리의 AI 개발 파트너 → **[[claude-code-setup|설치·로그인 안내]]** (가장 먼저, 유료 구독 필요)
+2. **Python + geemap** — 위성영상 다루기 (저장소 `설치가이드/README.md`)
+3. **Google Earth Engine 계정** — 위성영상 창고 열쇠 (저장소 `설치가이드/README.md`)
 
 > [!tip] 설치가 막히면
 > 에러 메시지를 그대로 복사해 Claude Code에게 *"이게 무슨 뜻이고 어떻게 고쳐?"* 라고 물어보세요. **이것도 바이브 코딩입니다.**

@@ -10,6 +10,7 @@ tags: [moc]
 > 매 장마다 돌아가는 결과물이 나오고, 장이 쌓이면 서비스가 완성된다.
 
 처음이라면 → [[00-getting-started|시작하기]]
+사전 셋팅(Claude Code 설치·로그인) → [[claude-code-setup|Claude Code 사전 셋팅]]
 
 ## 학습 경로 (순서대로)
 
