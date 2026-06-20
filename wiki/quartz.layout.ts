@@ -1,32 +1,30 @@
 import { PageLayout, SharedLayout } from "./quartz/cfg"
 import * as Component from "./quartz/components"
 
-// 목차(사이드바) 정렬 순서: 메인 지도 → 시작하기 → 사전 셋팅 → 0~6장 → 마무리
-const tocOrder = [
-  "00-home",
-  "00-getting-started",
-  "claude-code-setup",
-  "0-first-vibe-coding",
-  "1-prompts",
-  "2-ndvi-map",
-  "3-change-detection",
-  "4-service",
-  "5-agent-team",
-  "6-deploy",
-  "wrap-up",
-]
-const tocSort = (a: any, b: any) => {
-  const rank = (n: any) => {
-    const i = tocOrder.indexOf(n.slugSegment)
-    return i === -1 ? 999 : i
-  }
-  return rank(a) - rank(b)
-}
-
+// 목차(사이드바) — 정렬: 메인 지도 → 시작하기 → 사전 셋팅 → 0~6장 → 마무리
+// 주의: Explorer의 sortFn은 문자열로 직렬화되어 브라우저에서 실행되므로
+//       외부 변수를 참조하면 안 된다. 순서 배열을 함수 안에 인라인한다.
 const explorer = Component.Explorer({
   title: "목차",
   folderDefaultState: "open",
-  sortFn: tocSort,
+  sortFn: (a: any, b: any) => {
+    const order = [
+      "00-home",
+      "00-getting-started",
+      "claude-code-setup",
+      "0-first-vibe-coding",
+      "1-prompts",
+      "2-ndvi-map",
+      "3-change-detection",
+      "4-service",
+      "5-agent-team",
+      "6-deploy",
+      "wrap-up",
+    ]
+    const ra = order.indexOf(a.slugSegment)
+    const rb = order.indexOf(b.slugSegment)
+    return (ra === -1 ? 999 : ra) - (rb === -1 ? 999 : rb)
+  },
 })
 
 // 모든 페이지 공통
