@@ -55,8 +55,8 @@ jobs:
           fi
           # 우리 교재용 설정으로 교체
           cp repo/wiki/quartz.config.ts quartz/quartz.config.ts
-          # 커스텀 CSS 주입 (접이식 콜아웃 수정 등)
-          cp repo/wiki/custom.scss quartz/styles/custom.scss
+          # 커스텀 CSS 주입 (접이식 콜아웃 수정 등) — styles는 내부 소스 폴더 quartz/quartz/styles
+          cp repo/wiki/custom.scss quartz/quartz/styles/custom.scss
 
       - name: 설치 & 빌드
         working-directory: quartz
