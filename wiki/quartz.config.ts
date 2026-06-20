@@ -9,7 +9,7 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "말로 만드는 위성영상 변화탐지 서비스",
+    pageTitle: "대화로 시작하는 위성영상 분석 서비스",
     pageTitleSuffix: "",
     enableSPA: true,
     enablePopovers: true,
