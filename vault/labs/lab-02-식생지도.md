@@ -1,4 +1,5 @@
 ---
+title: "2장 실습 · NDVI 식생지도"
 tags: [유형/실습, 주제/geoai, 주제/claude-code, 난이도/입문]
 ---
 

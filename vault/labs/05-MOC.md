@@ -1,4 +1,5 @@
 ---
+title: "5장 · AI 에이전트 팀"
 tags: [moc, 주제/harness]
 ---
 

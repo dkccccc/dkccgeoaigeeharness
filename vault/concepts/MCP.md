@@ -1,4 +1,5 @@
 ---
+title: "MCP — AI의 외부 연결 통로"
 tags: [주제/claude-code, 유형/개념, 난이도/입문]
 ---
 

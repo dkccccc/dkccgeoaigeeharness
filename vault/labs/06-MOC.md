@@ -1,4 +1,5 @@
 ---
+title: "6장 · 세상에 내보내기"
 tags: [moc, 주제/claude-code]
 ---
 

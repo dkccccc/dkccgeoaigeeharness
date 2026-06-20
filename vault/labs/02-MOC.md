@@ -1,4 +1,5 @@
 ---
+title: "2장 · NDVI 식생지도 앱"
 tags: [moc, 주제/geoai, 주제/claude-code]
 ---
 

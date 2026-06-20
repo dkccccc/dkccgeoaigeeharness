@@ -1,4 +1,5 @@
 ---
+title: "4장 · 쓸 만한 변화탐지 서비스"
 tags: [moc, 주제/claude-code, 주제/geoai]
 ---
 

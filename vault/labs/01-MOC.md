@@ -1,4 +1,5 @@
 ---
+title: "1장 · 프롬프트가 전부다"
 tags: [moc, 주제/gee, 주제/claude-code]
 ---
 
