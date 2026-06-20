@@ -33,7 +33,7 @@ export const defaultContentPageLayout: PageLayout = {
         { Component: Component.ReaderMode() },
       ],
     }),
-    Component.Explorer(),
+    Component.Explorer({ title: "목차", folderDefaultState: "open" }),
     Component.Graph(), // ③ 그래프 뷰를 왼쪽 사이드바 아래로
   ],
   right: [], // ② 오른쪽 섹션(목차·백링크 등) 전부 제거
@@ -50,7 +50,7 @@ export const defaultListPageLayout: PageLayout = {
         { Component: Component.Darkmode() },
       ],
     }),
-    Component.Explorer(),
+    Component.Explorer({ title: "목차", folderDefaultState: "open" }),
     Component.Graph(),
   ],
   right: [],

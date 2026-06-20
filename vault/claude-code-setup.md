@@ -119,6 +119,6 @@ claude
 
 ## 다음
 
-준비가 끝났다면 → [[00-getting-started|시작하기]] 로 가서 나머지 도구(Obsidian·GEE)를 준비하고, [[chapters/0-first-vibe-coding|0장]]에서 첫 실습을 시작하세요.
+준비가 끝났다면 → [[00-getting-started|시작하기]] 로 가서 나머지 도구(Obsidian·GEE)를 준비하고, [[0-first-vibe-coding|0장]]에서 첫 실습을 시작하세요.
 
 > 공식 문서: [code.claude.com/docs](https://code.claude.com/docs)
