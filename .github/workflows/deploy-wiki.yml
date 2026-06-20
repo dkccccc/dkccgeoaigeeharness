@@ -57,6 +57,8 @@ jobs:
           cp repo/wiki/quartz.config.ts quartz/quartz.config.ts
           # 커스텀 CSS 주입 (접이식 콜아웃 수정 등) — styles는 내부 소스 폴더 quartz/quartz/styles
           cp repo/wiki/custom.scss quartz/quartz/styles/custom.scss
+          # 커스텀 레이아웃 주입 (제목 상단·오른쪽 제거·그래프 왼쪽)
+          cp repo/wiki/quartz.layout.ts quartz/quartz.layout.ts
 
       - name: 설치 & 빌드
         working-directory: quartz
