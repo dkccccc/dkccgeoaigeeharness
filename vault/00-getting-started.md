@@ -30,6 +30,6 @@ tags: [유형/실습, 난이도/입문]
 ## 3. 마음가짐
 
 > [!warning] 외우지 마세요
-> 여러분이 익힐 것은 GEE 명령어가 아니라 **무엇을 원하는지 말하는 법**입니다. 코드는 Claude가 씁니다. 여러분은 [[prompt-4-steps\|요청하고]], [[hallucination-check\|확인하고]], 고칩니다.
+> 여러분이 익힐 것은 GEE 명령어가 아니라 **무엇을 원하는지 말하는 법**입니다. 코드는 Claude가 씁니다. 여러분은 [[chapters/1-prompts\|요청하고]], [[chapters/0-first-vibe-coding\|확인하고]], 고칩니다.
 
-준비됐다면 → [[labs/00-MOC|0장 · 첫 바이브 코딩]] 으로!
+준비됐다면 → [[chapters/0-first-vibe-coding|0장 · 첫 바이브 코딩]] 으로!

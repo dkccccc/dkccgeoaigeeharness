@@ -13,23 +13,18 @@ tags: [moc]
 
 ## 학습 경로 (순서대로)
 
+각 장은 **이론 → 실습**을 담은 한 페이지입니다.
+
 | 장 | 들어가기 | 🟢 만드는 것 |
 |----|---------|------------|
-| 0 | [[labs/00-MOC\|0장 · 첫 바이브 코딩]] | 위성영상 한 장 띄우기 |
-| 1 | [[labs/01-MOC\|1장 · 프롬프트가 전부다]] | 위성영상 뷰어 |
-| 2 | [[labs/02-MOC\|2장 · 클로드 코드 실전]] | NDVI 식생지도 앱 |
-| 3 ⭐ | [[labs/03-MOC\|3장 · 변화를 탐지하기]] | 미니 변화탐지 앱 |
-| 4 | [[labs/04-MOC\|4장 · 진짜 데이터 붙이기]] | 쓸 만한 변화탐지 서비스 |
-| 5 | [[labs/05-MOC\|5장 · AI 에이전트 팀]] | 여러 지역 자동 분석 (Harness) |
-| 6 | [[labs/06-MOC\|6장 · 세상에 내보내기]] | 배포와 공유 |
+| 0 | [[chapters/0-first-vibe-coding\|0장 · 첫 바이브 코딩]] | 위성영상 한 장 띄우기 |
+| 1 | [[chapters/1-prompts\|1장 · 프롬프트가 전부다]] | 위성영상 뷰어 |
+| 2 | [[chapters/2-ndvi-map\|2장 · NDVI 식생지도 앱]] | NDVI 식생지도 앱 |
+| 3 ⭐ | [[chapters/3-change-detection\|3장 · 변화를 탐지하기]] | 미니 변화탐지 앱 |
+| 4 | [[chapters/4-service\|4장 · 쓸 만한 변화탐지 서비스]] | 실데이터 서비스 + 내보내기 |
+| 5 | [[chapters/5-agent-team\|5장 · AI 에이전트 팀]] | 여러 지역 자동 분석 (Harness) |
+| 6 | [[chapters/6-deploy\|6장 · 세상에 내보내기]] | 배포와 공유 |
 | 🏁 | [[wrap-up\|마무리 · 더 나아가기]] | 내 연구 주제로 확장 |
-
-## 핵심 개념 모음
-
-- 바이브 코딩: [[vibe-coding|바이브 코딩이란]] · [[prompt-4-steps|프롬프트 4단계]] · [[hallucination-check|할루시네이션 검증]]
-- 위성·원격탐사: [[satellite-imagery|위성영상이란]] · [[coordinate-system|좌표계]] · [[cloud-filter|구름 필터]] · [[NDVI]] · [[colormap|색지도 시각화]]
-- 변화탐지: [[change-detection|변화탐지란]] · [[interpreting-change|변화 해석하기]] · [[exporting-results|결과 내보내기]]
-- 자동화·공유: [[agent-team|에이전트 팀이란]] · [[batch-analysis|배치 분석]] · [[deployment|배포]] · [[MCP]]
 
 ## 도구
 
