@@ -2,10 +2,26 @@
 
 // === 교재 커스텀 CSS ===
 
-// Quartz 접이식 콜아웃 수정
+// (1) Quartz 접이식 콜아웃 수정
 // 기본 Quartz는 .callout-content 의 :first-child 만 height:0 으로 접어,
 // 단락이 여러 개인 콜아웃은 '첫 단락만' 접히는 문제가 있다.
 // → 접힌 상태에서는 내용 '전체'를 숨긴다.
 .callout.is-collapsed > .callout-content {
   display: none;
+}
+
+// (2) 오른쪽 사이드바 제거 (목차·백링크 자리)
+// 빈 오른쪽 사이드바를 숨기고, 데스크톱에서는 320px 오른쪽 컬럼을 없애
+// 본문이 그 공간을 넓게 쓰도록 그리드를 2컬럼으로 바꾼다.
+.sidebar.right {
+  display: none;
+}
+@media (min-width: 1200px) {
+  .page > #quartz-body {
+    grid-template:
+      "grid-sidebar-left grid-header"
+      "grid-sidebar-left grid-center"
+      "grid-sidebar-left grid-footer"
+      / 320px auto;
+  }
 }
