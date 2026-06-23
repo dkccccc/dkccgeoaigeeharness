@@ -50,7 +50,7 @@ streamlit run app.py
 - **온통 빨강 또는 초록** → 두 기간의 **계절이 달라** 식생이 통째로 바뀐 것처럼 보이는 가짜 변화. 이전/이후를 같은 계절(예: 둘 다 여름)로 맞추세요.
 - **잡티처럼 빨강·초록 점이 너무 많음** → 두 시점 중 하나에 구름·그림자가 낀 것. 구름 임계값을 낮추거나 기간을 넓혀 더 맑은 영상이 들어가게 하세요.
 - **개발지인데 증가(초록)가 더 많음** → 이전/이후 순서가 바뀐 것. 변화량은 `after.subtract(before)`(이후 − 이전)가 맞습니다.
-- 지도가 안 뜸(빈 화면) → `import geemap.foliumap as geemap` 인지 확인. Streamlit 안에서는 folium 백엔드라야 지도가 임베드됩니다.
+- 지도가 안 뜸(빈 화면) → `from streamlit_folium import st_folium` 으로 그렸는지, `add_ee_layer`(getMapId→TileLayer)로 GEE 레이어를 올렸는지 확인.
 - 그 외 에러는 메시지를 복사해 Claude Code에게 물어보세요.
 
 > 코드 검증 메모: NDVI 식(`normalizedDifference(["B8","B4"])`)·발산형 팔레트(`["#d73027","#ffffff","#1a9850"]`, min/max −0.3~0.3)·`subtract` 차분은 참고 프로젝트 `dkidi`·`dkchangedetection` 의 실제 패턴에 근거합니다.

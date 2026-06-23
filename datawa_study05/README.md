@@ -75,7 +75,7 @@ streamlit run app.py         # 앱 실행
 
 ## 막히면
 
-- **지도가 빈 회색** → `geemap.foliumap` 이 아니라 일반 `geemap` 을 import 한 경우. 웹앱에서는 `import geemap.foliumap as geemap` 이어야 합니다.
+- **지도가 빈 회색** → `st_folium(m)` 으로 그렸는지, GEE 레이어를 `add_ee_layer`(getMapId)로 올렸는지 확인.
 - **한 지역만 "건너뜀"** → 그 기간에 맑은 영상이 없는 것. 사이드바의 `구름 임계값` 을 30~40으로 올리거나 기간을 넓히세요. 나머지 지역은 정상 처리됩니다.
 - **모든 지역 "건너뜀"** → 인증/초기화가 안 됐거나 좌표 형식이 틀린 것. 터미널에서 `earthengine authenticate` 를 먼저 하고, 목록을 `이름,위도,경도`(쉼표·숫자) 형식으로 적었는지 확인하세요.
 - **목록이 비었다는 오류** → 텍스트 영역에 `이름,위도,경도` 가 한 줄도 없는 것. 한 줄에 하나씩, 칸을 쉼표로 나눠 적으세요. (위도가 앞, 경도가 뒤)
@@ -84,4 +84,4 @@ streamlit run app.py         # 앱 실행
 - **`streamlit: command not found`** → `pip install -r requirements.txt` 후 다시.
 - 그 외 에러는 메시지를 복사해 Claude Code에게 물어보세요. (프롬프트 0-2 패턴)
 
-> 코드 검증 메모: `run_change_detection` 의 시그니처·반환 dict(`mean_change`, `decrease_ratio`, `increase_ratio`, `area_km2`)는 4장 `datawa_study04/service.py`·6장 `datawa_study06/app.py` 와 동일합니다. 5장은 이 함수를 여러 지역에 반복 호출만 합니다(경계면 일치). Streamlit 안에서 EE 지도를 임베드할 때 `geemap.foliumap` + `Map.to_streamlit()` 을 쓰는 것은 geemap 공식 streamlit 예제의 표준 패턴입니다.
+> 코드 검증 메모: `run_change_detection` 의 시그니처·반환 dict(`mean_change`, `decrease_ratio`, `increase_ratio`, `area_km2`)는 4장 `datawa_study04/service.py`·6장 `datawa_study06/app.py` 와 동일합니다. 5장은 이 함수를 여러 지역에 반복 호출만 합니다(경계면 일치). Streamlit 안 EE 지도는 `ee.getMapId()` 타일을 folium에 올리고 `st_folium()` 으로 그립니다 (dkidi와 같은 raw ee + Leaflet 방식).

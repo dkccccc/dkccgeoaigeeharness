@@ -11,8 +11,9 @@ datawa_study01 · 위성영상 뷰어 웹앱
 """
 
 import ee
-import geemap.foliumap as geemap
+import folium
 import streamlit as st
+from streamlit_folium import st_folium
 
 # 1) Earth Engine 초기화
 #    사전에 터미널에서 'earthengine authenticate' 를 한 번 해두면 됩니다.
@@ -22,13 +23,27 @@ except Exception:
     ee.Authenticate()
     ee.Initialize()
 
-# 2) 웹앱 기본 설정
+
+# 2) GEE 이미지를 folium 지도에 올리는 헬퍼
+#    ee 이미지를 '타일 URL'로 바꿔(getMapId) folium 타일 레이어로 추가한다.
+def add_ee_layer(fmap, ee_image, vis, name):
+    mapid = ee_image.getMapId(vis)
+    folium.TileLayer(
+        tiles=mapid["tile_fetcher"].url_format,
+        attr="Google Earth Engine",
+        name=name,
+        overlay=True,
+        control=True,
+    ).add_to(fmap)
+
+
+# 3) 웹앱 기본 설정
 st.set_page_config(page_title="위성영상 뷰어", layout="wide")
 st.title("🛰️ 위성영상 뷰어 웹앱")
 st.caption("사이드바에서 지역을 고르면 그 지역의 맑은 위성영상을 보여줍니다")
 
 
-# 3) 관심 지역(ROI) 만들기 — 점을 반경만큼 키워 사각형으로
+# 4) 관심 지역(ROI) 만들기 — 점을 반경만큼 키워 사각형으로
 def make_roi(lon, lat, radius_km):
     """중심 좌표(lon, lat)를 반경(km)만큼 buffer 후 사각형으로 만든 ROI."""
     point = ee.Geometry.Point([lon, lat])
@@ -36,7 +51,7 @@ def make_roi(lon, lat, radius_km):
     return point.buffer(radius_km * 1000).bounds()
 
 
-# 4) ROI에 대해 구름 적은 가장 맑은 Sentinel-2 한 장 고르기
+# 5) ROI에 대해 구름 적은 가장 맑은 Sentinel-2 한 장 고르기
 def s2_image(roi, start, end):
     """ROI를 덮는 영상 중 구름 20% 미만에서 가장 맑은 한 장을 골라 clip한다."""
     collection = (
@@ -49,7 +64,7 @@ def s2_image(roi, start, end):
     return collection.first().clip(roi)                      # 가장 맑은 한 장, ROI로 자름
 
 
-# 5) 사이드바 — 학습자가 지역과 기간을 직접 고른다
+# 6) 사이드바 — 학습자가 지역과 기간을 직접 고른다
 st.sidebar.header("📍 지역 고르기")
 lat = st.sidebar.number_input("중심 위도", value=37.5, format="%.4f")
 lon = st.sidebar.number_input("중심 경도", value=127.0, format="%.4f")
@@ -61,16 +76,17 @@ end = st.sidebar.text_input("종료일", value="2024-12-31")
 
 run = st.sidebar.button("분석 / 보기", type="primary")
 
-# 6) 버튼을 누르면 지도에 영상 표시
+# 7) 버튼을 누르면 지도에 영상 표시
 if run:
     roi = make_roi(lon, lat, radius_km)
     image = s2_image(roi, start, end)
     vis = {"bands": ["B4", "B3", "B2"], "min": 0, "max": 3000}  # 자연색(RGB)
 
-    m = geemap.Map()
-    m.add_layer(image, vis, "Sentinel-2 (가장 맑은 한 장)")
-    m.center_object(roi)          # 고른 영역으로 지도를 맞춘다
-    m.to_streamlit(height=600)
+    # 사이드바에서 고른 중심 좌표로 지도를 맞춘다 (lat, lon 순서)
+    m = folium.Map(location=[lat, lon], zoom_start=12)
+    add_ee_layer(m, image, vis, "Sentinel-2 (가장 맑은 한 장)")
+    folium.LayerControl().add_to(m)
+    st_folium(m, width=None, height=600, returned_objects=[])
 
     st.success(
         f"위도 {lat}, 경도 {lon} 반경 {radius_km}km 영역의 "

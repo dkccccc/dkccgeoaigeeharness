@@ -93,7 +93,7 @@ tags: [장/2, 주제/geoai, 주제/claude-code, 난이도/입문]
 > - **온통 한 가지 색** → `min`/`max` 범위가 영역과 안 맞는 것. NDVI는 보통 −0.2~0.8 사이. 범위를 좁혀보세요.
 > - **물이 높고 숲이 낮게 나옴** → 근적외선(B8)과 빨강(B4) 밴드 순서가 바뀐 것. `normalizedDifference(["B8", "B4"])` 가 맞습니다.
 > - **영역에 색이 안 뜸** → 기간(`시작일`/`종료일`)에 맑은 영상이 없을 수 있음. 기간을 넓혀보세요. → [[1-prompts|구름 필터]]
-> - **`add_colorbar` 가 없다는 에러** → geemap 버전이 낮은 경우. `pip install -U geemap` 로 올려보세요.
+> - **범례(색지도)가 안 뜸** → `branca` 가 없는 경우. `streamlit-folium` 을 설치하면 함께 깔리지만, 안 되면 `pip install branca` 로 따로 설치하세요.
 > - 완성 코드는 `datawa_study02/app.py` 참고.
 
 ---

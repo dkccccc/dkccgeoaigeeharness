@@ -19,9 +19,11 @@ datawa_study03 · 미니 변화탐지 웹앱 (누적 앱 전체)
     streamlit run app.py
 """
 
+import branca.colormap as bcm
 import ee
-import geemap.foliumap as geemap   # streamlit 안에서는 folium 백엔드라야 지도가 뜸
+import folium
 import streamlit as st
+from streamlit_folium import st_folium
 
 
 # =====================================================================
@@ -38,6 +40,19 @@ def init_ee():
     except Exception:
         ee.Authenticate()
         ee.Initialize()
+
+
+# GEE 이미지를 folium 지도에 올리는 헬퍼 (0장과 동일)
+# ee 이미지를 '타일 URL'로 바꿔(getMapId) folium 타일 레이어로 추가한다.
+def add_ee_layer(fmap, ee_image, vis, name):
+    mapid = ee_image.getMapId(vis)
+    folium.TileLayer(
+        tiles=mapid["tile_fetcher"].url_format,
+        attr="Google Earth Engine",
+        name=name,
+        overlay=True,
+        control=True,
+    ).add_to(fmap)
 
 
 # =====================================================================
@@ -162,31 +177,39 @@ roi = make_roi(lon, lat, radius_km)
 
 # --- 보기 모드에 따라 다른 이미지를 그립니다 ---
 try:
-    m = geemap.Map()
+    # 사이드바 중심좌표로 지도 중심을 잡는다 (geemap center_object 대체)
+    m = folium.Map(location=[lat, lon], zoom_start=12)
 
     if mode == "자연색":
         # 이후 기간의 자연색 영상 한 장 (눈으로 지형 확인용)
         image = natural_color(roi, after[0], after[1], cloud_pct)
-        m.add_layer(image, NATURAL_VIS, "자연색 (이후 기간)")
+        add_ee_layer(m, image, NATURAL_VIS, "자연색 (이후 기간)")
         st.subheader("🌍 자연색  (이후 기간의 가장 맑은 한 장)")
 
     elif mode == "NDVI":
         # 이후 기간의 NDVI 색지도 (식생 분포)
         ndvi = ndvi_for_roi(roi, after[0], after[1], cloud_pct)
-        m.add_layer(ndvi, NDVI_VIS, "NDVI (이후 기간)")
-        m.add_colorbar(NDVI_VIS, label="NDVI (식생지수)")
+        add_ee_layer(m, ndvi, NDVI_VIS, "NDVI (이후 기간)")
+        bcm.LinearColormap(
+            colors=NDVI_VIS["palette"], vmin=NDVI_VIS["min"], vmax=NDVI_VIS["max"],
+            caption="NDVI (식생지수)",
+        ).add_to(m)
         st.subheader("🌱 NDVI 식생지도  (초록일수록 식생 많음)")
 
     else:  # "변화" — 이 장의 핵심
         # 두 시점 NDVI 차분 → 발산형 히트맵
         change = ndvi_change(roi, before, after, cloud_pct)
-        m.add_layer(change, CHANGE_VIS, "NDVI 변화 (이후 − 이전)")
-        m.add_colorbar(CHANGE_VIS, label="NDVI 변화량 (− 감소 / + 증가)")
+        add_ee_layer(m, change, CHANGE_VIS, "NDVI 변화 (이후 − 이전)")
+        # 발산형 변화 히트맵 범례 (감소=빨강 / 0=흰 / 증가=초록)
+        bcm.LinearColormap(
+            colors=CHANGE_VIS["palette"], vmin=CHANGE_VIS["min"], vmax=CHANGE_VIS["max"],
+            caption="NDVI 변화량 (− 감소 / + 증가)",
+        ).add_to(m)
         st.subheader("🔥 변화 히트맵  (빨강=식생 감소 · 초록=식생 증가)")
         st.caption("개발·벌채는 빨강, 농사 시작·숲 회복은 초록, 변화 없는 곳은 흰색에 가깝습니다.")
 
-    m.center_object(roi)
-    m.to_streamlit(height=560)   # ← folium 지도를 streamlit 화면에 끼워 넣는 한 줄
+    folium.LayerControl().add_to(m)
+    st_folium(m, width=None, height=560, returned_objects=[])   # ← folium 지도를 streamlit 화면에 끼워 넣는다
 
 except Exception as e:
     st.error("그 기간에 맑은 영상이 없거나 영역이 너무 작을 수 있어요. "

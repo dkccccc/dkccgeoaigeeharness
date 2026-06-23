@@ -16,10 +16,12 @@ import csv
 import io
 import json
 
+import branca.colormap as bcm
 import ee
-import geemap.foliumap as geemap
+import folium
 import pandas as pd
 import streamlit as st
+from streamlit_folium import st_folium
 
 # 1) Earth Engine 초기화
 #    사전에 터미널에서 'earthengine authenticate' 를 한 번 해두면 됩니다.
@@ -28,6 +30,20 @@ try:
 except Exception:
     ee.Authenticate()
     ee.Initialize()
+
+
+# GEE 이미지를 folium 지도에 올리는 헬퍼
+# ee 이미지를 '타일 URL'로 바꿔(getMapId) folium 타일 레이어로 추가한다.
+def add_ee_layer(fmap, ee_image, vis, name):
+    mapid = ee_image.getMapId(vis)
+    folium.TileLayer(
+        tiles=mapid["tile_fetcher"].url_format,
+        attr="Google Earth Engine",
+        name=name,
+        overlay=True,
+        control=True,
+    ).add_to(fmap)
+
 
 # 2) 웹앱 기본 설정
 st.set_page_config(page_title="변화탐지 서비스", layout="wide")
@@ -278,24 +294,26 @@ if run:
     c4.metric("분석 영역", f"{result['area_km2']:.1f} km²")
 
     # --- 보기 모드에 따라 지도에 다른 레이어를 올린다 ---
-    m = geemap.Map()
+    m = folium.Map(location=[lat, lon], zoom_start=11)
     if view_mode == "변화 (감소/증가)":
         vis = {"min": -0.3, "max": 0.3,
                "palette": ["#d73027", "#ffffff", "#1a9850"]}  # 감소(빨강)→흰→증가(초록)
-        m.add_layer(result["image"], vis, "NDVI 변화")
-        m.add_colorbar(vis, label="NDVI 변화량 (- 감소 / + 증가)")
+        add_ee_layer(m, result["image"], vis, "NDVI 변화")
+        bcm.LinearColormap(colors=vis["palette"], vmin=vis["min"], vmax=vis["max"],
+                           caption="NDVI 변화량 (- 감소 / + 증가)").add_to(m)
     elif view_mode == "NDVI 식생지도":
         ndvi = ndvi_for_roi(roi, after[0], after[1], cloud_pct)  # 이후 시점 NDVI
         vis = {"min": -0.2, "max": 0.8,
                "palette": ["#a52a2a", "#ffffff", "#228b22"]}  # 갈색→흰→초록
-        m.add_layer(ndvi, vis, "NDVI 식생지도 (이후 시점)")
-        m.add_colorbar(vis, label="NDVI (식생지수)")
+        add_ee_layer(m, ndvi, vis, "NDVI 식생지도 (이후 시점)")
+        bcm.LinearColormap(colors=vis["palette"], vmin=vis["min"], vmax=vis["max"],
+                           caption="NDVI (식생지수)").add_to(m)
     else:  # 자연색
         image = s2_image(roi, after[0], after[1], cloud_pct)
-        m.add_layer(image, {"bands": ["B4", "B3", "B2"], "min": 0, "max": 3000},
-                    "자연색 (이후 시점)")
-    m.center_object(roi)
-    m.to_streamlit(height=600)
+        add_ee_layer(m, image, {"bands": ["B4", "B3", "B2"], "min": 0, "max": 3000},
+                     "자연색 (이후 시점)")
+    folium.LayerControl().add_to(m)
+    st_folium(m, width=None, height=600, returned_objects=[])
 
     # --- (4-2) 격자 셀 통계 → GeoJSON/CSV 다운로드 버튼 ---
     st.subheader("📦 결과 내보내기 (셀 단위)")

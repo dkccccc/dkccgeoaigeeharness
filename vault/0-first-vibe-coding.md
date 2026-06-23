@@ -83,7 +83,7 @@ tags: [장/0, 주제/gee, 주제/claude-code, 난이도/입문]
 저장소 `PROMPTS.md` 의 프롬프트 **0-1** 을 복사해 Claude Code에게 그대로 보냅니다.
 
 > [!quote] 프롬프트 0-1
-> 나는 원격탐사 연구자인데 코딩은 거의 처음이야. **Streamlit**과 Google Earth Engine(geemap)을 써서, 서울 지역의 최근 Sentinel-2 위성영상 한 장을 지도에 띄우는 가장 간단한 **웹앱(app.py)** 을 만들어줘. 브라우저에서 `streamlit run app.py` 로 실행되게. 한 줄씩 무슨 일을 하는지 한국어 주석으로 설명하고, 설치 명령과 Earth Engine 인증 방법도 알려줘.
+> 나는 원격탐사 연구자인데 코딩은 거의 처음이야. **Streamlit**·**folium(Leaflet)**과 Google Earth Engine을 써서, 서울 지역의 최근 Sentinel-2 위성영상 한 장을 지도에 띄우는 가장 간단한 **웹앱(app.py)** 을 만들어줘. 브라우저에서 `streamlit run app.py` 로 실행되게. 한 줄씩 무슨 일을 하는지 한국어 주석으로 설명하고, 설치 명령과 Earth Engine 인증 방법도 알려줘.
 
 Claude가 웹앱 코드와 설명을 줄 것입니다. 왜 이렇게 부탁하는지는 [[1-prompts|1장 · 말하는 대로]]에서 자세히 다룹니다.
 

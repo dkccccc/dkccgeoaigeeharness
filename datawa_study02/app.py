@@ -16,9 +16,11 @@ datawa_study02 · NDVI 식생지도 웹앱
 처럼 쓸 것입니다.
 """
 
+import branca.colormap as bcm
 import ee
-import geemap.foliumap as geemap
+import folium
 import streamlit as st
+from streamlit_folium import st_folium
 
 # 1) Earth Engine 초기화
 #    사전에 터미널에서 'earthengine authenticate' 를 한 번 해두면 됩니다.
@@ -27,6 +29,20 @@ try:
 except Exception:
     ee.Authenticate()
     ee.Initialize()
+
+
+# GEE 이미지를 folium 지도에 올리는 헬퍼
+# ee 이미지를 '타일 URL'로 바꿔(getMapId) folium 타일 레이어로 추가한다.
+def add_ee_layer(fmap, ee_image, vis, name):
+    mapid = ee_image.getMapId(vis)
+    folium.TileLayer(
+        tiles=mapid["tile_fetcher"].url_format,
+        attr="Google Earth Engine",
+        name=name,
+        overlay=True,
+        control=True,
+    ).add_to(fmap)
+
 
 # 2) 웹앱 기본 설정
 st.set_page_config(page_title="NDVI 식생지도", layout="wide")
@@ -88,15 +104,15 @@ def ndvi_for_roi(roi, start, end):
 
 
 # 7) 지도 웹앱에 띄우기
-center = [lat, lon]            # geemap 은 [위도, 경도] 순서
+center = [lat, lon]            # folium 은 [위도, 경도] 순서
 roi = make_roi(lon, lat, radius_km)
-m = geemap.Map(center=center, zoom=11)
+m = folium.Map(location=center, zoom_start=11)
 
 if mode == "자연색":
     # 1장과 동일: 구름 적은 가장 맑은 한 장을 자연색(RGB)으로
     image = clearest_s2(roi, start, end)
     vis = {"bands": ["B4", "B3", "B2"], "min": 0, "max": 3000}  # 자연색(RGB)
-    m.add_layer(image, vis, "Sentinel-2 자연색")
+    add_ee_layer(m, image, vis, "Sentinel-2 자연색")
 else:
     # 추가: NDVI 색지도 — 낮음(갈색) → 중간(흰) → 높음(초록)
     ndvi = ndvi_for_roi(roi, start, end)
@@ -105,12 +121,17 @@ else:
         "max": 0.8,
         "palette": ["#a52a2a", "#ffffff", "#228b22"],  # 갈색 → 흰 → 초록
     }
-    m.add_layer(ndvi, vis, "NDVI 식생지도")
-    # 범례(colorbar): 색이 무슨 값을 뜻하는지 보여준다
-    m.add_colorbar(vis, label="NDVI (식생지수)")
+    add_ee_layer(m, ndvi, vis, "NDVI 식생지도")
+    # 범례(colorbar): 색이 무슨 값을 뜻하는지 보여준다 — 이 장의 핵심
+    bcm.LinearColormap(
+        colors=vis["palette"],
+        vmin=vis["min"],
+        vmax=vis["max"],
+        caption="NDVI (식생지수)",
+    ).add_to(m)
 
-m.center_object(roi, zoom=11)
-m.to_streamlit(height=600)
+folium.LayerControl().add_to(m)
+st_folium(m, width=None, height=600, returned_objects=[])
 
 if mode == "자연색":
     st.info("구름 적은 가장 맑은 한 장을 자연색으로 보고 있어요. 사이드바에서 보기 모드를 'NDVI'로 바꿔보세요.")

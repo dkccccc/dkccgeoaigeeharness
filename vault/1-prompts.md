@@ -54,7 +54,7 @@ streamlit run app.py
 
 > [!quote] 1-1
 > 나는 원격탐사 연구자인데 코딩은 초보야. 0장에서 만든 `datawa_study00/app.py`(위성영상 한 장을 띄우는 Streamlit 웹앱)를 이어서 키우고 싶어. `datawa_study01/app.py`로 새로 만들어줘.
-> 먼저 영상 기능은 빼고 **웹앱 골격**부터 만들어줘. `st.sidebar`에 중심 위도·경도·반경(km)을 입력받는 칸과 `[분석 / 보기]` 버튼을 두고, 본문에는 `geemap.foliumap`으로 빈 지도를 `m.to_streamlit()`으로 띄워줘. `ee.Initialize()`는 0장처럼 try/except로 감싸고, 주석은 한국어로 달아줘.
+> 먼저 영상 기능은 빼고 **웹앱 골격**부터 만들어줘. `st.sidebar`에 중심 위도·경도·반경(km)을 입력받는 칸과 `[분석 / 보기]` 버튼을 두고, 본문에는 0장처럼 `folium`으로 빈 지도를 만들어 `st_folium()`으로 띄워줘. `ee.Initialize()`는 0장처럼 try/except로 감싸고, 주석은 한국어로 달아줘.
 
 > [!success] 확인
 > `streamlit run app.py` 하면 브라우저가 열리고, **왼쪽 사이드바에 위도·경도·반경 입력칸과 버튼**이 보이며 본문에 지도가 뜬다.

@@ -70,12 +70,12 @@ streamlit run app.py         # 앱 실행
 
 ## 막히면
 
-- **지도가 빈 회색** → `import geemap.foliumap as geemap` 인지 확인. 웹앱에서는 folium 백엔드 + `m.to_streamlit()` 이어야 지도가 뜹니다.
+- **지도가 빈 회색** → `st_folium(m)` 으로 그렸는지, `add_ee_layer`(getMapId)로 GEE 레이어를 올렸는지 확인.
 - **로컬에서 `EEException: not initialized`** → `earthengine authenticate` 를 안 한 것. 터미널에서 먼저 인증하세요.
 - **`streamlit: command not found`** → 설치가 안 된 것. `pip install -r requirements.txt` 후 다시.
 - **클라우드에서 인증 오류 / 결과가 안 뜸** → Secrets 의 서비스 계정이 빠졌거나, 그 서비스 계정 이메일이 Earth Engine 에 **사용자로 등록되지 않은** 것. 4단계와 3단계 마지막 항목을 확인하세요. `private_key` 의 `\n` 이 풀려 있어도 실패합니다.
-- **클라우드 배포가 `ModuleNotFoundError`** → `requirements.txt` 에 패키지를 빠뜨린 것. `streamlit`·`geemap`·`earthengine-api` 세 줄을 확인하세요.
+- **클라우드 배포가 `ModuleNotFoundError`** → `requirements.txt` 에 패키지를 빠뜨린 것. `streamlit`·`folium`·`streamlit-folium`·`earthengine-api` 를 확인하세요.
 - **결과가 계속 비어 있음** → 그 기간에 맑은 영상이 없는 것. 구름 임계값을 30~40 으로 올리거나 반경을 줄이세요.
 - 그 외 에러는 메시지를 복사해 Claude Code에게 물어보세요. (프롬프트 0-2 패턴)
 
-> 코드 검증 메모: 분석 로직(`run_change_detection` · `batch_change_detection`)은 4장 `datawa_study04/service.py` · 5장 `datawa_study05/batch.py` 와 동일합니다. Streamlit 안 EE 지도 임베드(`geemap.foliumap` + `Map.to_streamlit()`)와 서비스 계정 인증(`ee.ServiceAccountCredentials`)은 geemap·Earth Engine 공식 배포 패턴입니다.
+> 코드 검증 메모: 분석 로직(`run_change_detection` · `batch_change_detection`)은 4장 `datawa_study04/service.py` · 5장 `datawa_study05/batch.py` 와 동일합니다. Streamlit 안 EE 지도(`ee.getMapId()` 타일 → folium → `st_folium()`)와 서비스 계정 인증(`ee.ServiceAccountCredentials`)은 dkidi와 같은 raw ee + Leaflet 방식입니다.

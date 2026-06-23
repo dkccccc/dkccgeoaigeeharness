@@ -56,7 +56,7 @@ tags: [장/6, 주제/claude-code, 난이도/입문]
 배포하려면 두 가지를 미리 챙겨야 합니다. **(1) `requirements.txt`** — 클라우드 서버는 빈 컴퓨터라, 어떤 패키지를 깔아야 하는지 적힌 목록이 있어야 앱이 뜹니다. **(2) 클라우드용 인증** — 클라우드에는 `earthengine authenticate` 의 **브라우저 로그인 창이 없습니다.** 그래서 사람이 로그인하는 대신 **서비스 계정**(robot 계정)의 열쇠로 조용히 인증하게 합니다. 같은 코드가 로컬에서도 클라우드에서도 돌도록, **인증을 자동으로 갈라** 줍니다.
 
 > [!quote] 6-1
-> 좋아, 5장 앱(한 지역 + 여러 지역 분석)이 로컬에서 잘 돌아가. 이제 이걸 배포할 수 있게 준비하고 싶어. 두 가지를 해줘. 첫째, 필요한 패키지를 담은 `requirements.txt`를 만들어줘(streamlit, geemap, earthengine-api). 둘째, Earth Engine 인증을 클라우드에서도 되게 고쳐줘 — `st.secrets`에 서비스 계정 JSON이 있으면 `ee.ServiceAccountCredentials`로 초기화하고, 없으면 로컬처럼 `ee.Initialize()`를 쓰도록 try/except로 분기해줘. 분석 로직(`run_change_detection`·`batch_change_detection`)은 그대로 두고, 왜 이렇게 갈리는지 한국어 주석으로 설명해줘.
+> 좋아, 5장 앱(한 지역 + 여러 지역 분석)이 로컬에서 잘 돌아가. 이제 이걸 배포할 수 있게 준비하고 싶어. 두 가지를 해줘. 첫째, 필요한 패키지를 담은 `requirements.txt`를 만들어줘(streamlit, earthengine-api, folium, streamlit-folium, pandas). 둘째, Earth Engine 인증을 클라우드에서도 되게 고쳐줘 — `st.secrets`에 서비스 계정 JSON이 있으면 `ee.ServiceAccountCredentials`로 초기화하고, 없으면 로컬처럼 `ee.Initialize()`를 쓰도록 try/except로 분기해줘. 분석 로직(`run_change_detection`·`batch_change_detection`)은 그대로 두고, 왜 이렇게 갈리는지 한국어 주석으로 설명해줘.
 
 로컬에서 먼저 그대로 도는지 확인합니다(인증 분기를 더했어도 로컬 동작은 똑같아야 합니다).
 
@@ -67,7 +67,7 @@ streamlit run app.py
 ```
 
 > [!success] 확인
-> 폴더에 **`requirements.txt`** 가 생기고 안에 `streamlit` · `geemap` · `earthengine-api` 세 줄이 있으면 됩니다. 그리고 `streamlit run app.py` 가 **5장과 똑같이** 떠야 합니다 — 인증 분기를 더했어도 로컬에선 기존 토큰으로 조용히 초기화되므로, 화면(한 지역 탭 + 여러 지역 탭)은 그대로 보이면 성공입니다.
+> 폴더에 **`requirements.txt`** 가 생기고 안에 `streamlit` · `earthengine-api` · `folium` · `streamlit-folium` · `pandas` 가 있으면 됩니다. 그리고 `streamlit run app.py` 가 **5장과 똑같이** 떠야 합니다 — 인증 분기를 더했어도 로컬에선 기존 토큰으로 조용히 초기화되므로, 화면(한 지역 탭 + 여러 지역 탭)은 그대로 보이면 성공입니다.
 > ```
 >   You can now view your Streamlit app in your browser.
 >   Local URL: http://localhost:8501
@@ -122,11 +122,11 @@ client_email = "내서비스계정@내-프로젝트.iam.gserviceaccount.com"
 ### 막히면
 
 > [!warning] 자주 나는 오류
-> - **지도가 빈 회색** → 일반 `geemap`을 import 한 것. 웹앱에서는 `import geemap.foliumap as geemap` + `m.to_streamlit()`이어야 지도가 뜹니다.
+> - **지도가 빈 회색** → Earth Engine 이미지를 직접 지도에 못 올리는 것. 웹앱에서는 `ee_image.getMapId(vis)` 로 받은 타일 URL을 `folium.TileLayer` 로 올리고 `st_folium(m, ...)` 으로 그려야 지도가 뜹니다.
 > - **로컬에서 `EEException: not initialized`** → `earthengine authenticate`를 안 한 것. 터미널에서 먼저 인증하세요.
 > - **`streamlit: command not found`** → 설치가 안 된 것. `pip install -r requirements.txt` 후 다시.
 > - **클라우드에서 인증이 안 됨** → 클라우드엔 브라우저 인증 창이 없습니다. **서비스 계정** JSON을 앱 설정 → **Secrets**에 `[gee_service_account]`로 넣어야 합니다. (Google Cloud에서 서비스 계정 키 발급 → 그 계정 이메일을 Earth Engine에 사용자로 등록 → Secrets에 붙여넣기) `private_key`의 `\n`을 여러 줄로 풀면 실패하니 그대로 두세요. 처음엔 **로컬 `streamlit run`**으로 충분히 확인한 뒤 공유가 필요할 때 클라우드로 올리세요.
-> - **클라우드 배포가 `ModuleNotFoundError`** → `requirements.txt`에 패키지를 빠뜨린 것. `streamlit`·`geemap`·`earthengine-api` 세 줄을 확인하세요.
+> - **클라우드 배포가 `ModuleNotFoundError`** → `requirements.txt`에 패키지를 빠뜨린 것. `streamlit`·`earthengine-api`·`folium`·`streamlit-folium`·`pandas` 를 확인하세요.
 > - **결과가 계속 비어 있음** → 그 기간에 맑은 영상이 없는 것. [[1-prompts|구름 임계값]]을 30~40으로 올리거나 반경을 줄이세요.
 > - **`/mcp`에 아무것도 안 뜸** → 설정 파일 경로·JSON 형식이 틀렸을 수 있음. Claude Code를 껐다 켠 뒤 다시 `/mcp`를 확인하세요.
 > - 완성 코드는 `datawa_study06/app.py`, 배포 절차는 `datawa_study06/README.md` 참고.

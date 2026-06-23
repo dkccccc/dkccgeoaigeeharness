@@ -1,4 +1,5 @@
 streamlit
-geemap
 earthengine-api
+folium
+streamlit-folium
 pandas

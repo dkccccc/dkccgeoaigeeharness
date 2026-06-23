@@ -96,7 +96,7 @@ tags: [장/3, 주제/geoai, 난이도/입문]
 
 > [!warning] 자주 나는 오류
 > - **`ee.Initialize` 오류 / `Please authorize...`** → 터미널에서 `earthengine authenticate` 를 한 번 실행한 뒤 `streamlit run app.py` 다시. ([[0-first-vibe-coding|0장]]과 동일)
-> - **지도가 안 뜸(빈 화면)** → Streamlit 안에서는 `import geemap.foliumap as geemap` (folium 백엔드)라야 지도가 임베드됩니다. import 줄을 확인하세요.
+> - **지도가 안 뜸(빈 화면)** → Streamlit 안에서는 `folium` 지도를 `st_folium(m, ...)` 으로 끼워 넣어야 임베드됩니다. import(`folium` / `streamlit_folium`) 줄과 `st_folium` 호출을 확인하세요.
 > - **온통 흰색** → 변화량이 작아 색이 안 보이는 것. 히트맵 끝값을 −0.2 ~ +0.2 처럼 좁혀 대비를 키우세요. → [[2-ndvi-map|색지도 시각화]]
 > - **온통 빨강 또는 초록** → 두 기간의 **계절이 달라** 식생이 통째로 바뀐 것처럼 보이는 가짜 변화. 사이드바의 이전/이후 기간을 같은 계절(예: 둘 다 여름)로 맞추세요. (위 **변화 해석하기**)
 > - **잡티처럼 빨강·초록 점이 너무 많음** → 두 시점 중 하나에 구름·그림자가 낀 것. 구름 임계값을 낮추거나 기간을 넓혀 더 맑은 영상이 들어가게 하세요. → [[1-prompts|구름 필터]]

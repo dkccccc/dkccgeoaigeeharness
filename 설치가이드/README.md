@@ -31,11 +31,11 @@ python -m venv .venv
 .venv\Scripts\activate        # Windows
 # source .venv/bin/activate   # macOS/Linux
 
-# 2) 필요한 패키지 — 웹앱(streamlit) + 위성영상(geemap, earthengine)
-pip install streamlit geemap earthengine-api
+# 2) 필요한 패키지 — 웹앱(streamlit+folium) + 위성영상(earthengine-api)
+pip install streamlit folium streamlit-folium earthengine-api
 ```
 
-> 설치 명령이 기억나지 않아도 됩니다. Claude Code에게 *"Streamlit + geemap 웹앱 실습 환경을 만들고 싶어, 필요한 설치 명령을 알려줘"* 라고 물으면 됩니다.
+> 설치 명령이 기억나지 않아도 됩니다. Claude Code에게 *"Streamlit + folium 웹앱 실습 환경을 만들고 싶어, 필요한 설치 명령을 알려줘"* 라고 물으면 됩니다.
 
 ## 4. Google Earth Engine 계정
 

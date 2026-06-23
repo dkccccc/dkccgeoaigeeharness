@@ -44,7 +44,7 @@ streamlit run app.py       # 브라우저가 열립니다
 - **온통 한 색** → `min`/`max` 범위(`-0.2`~`0.8`)가 영역과 안 맞을 수 있음. 범위를 좁혀보세요.
 - **물이 높고 숲이 낮음** → 밴드 순서가 바뀐 것. `normalizedDifference(["B8", "B4"])`(B8=근적외선, B4=빨강)가 맞습니다.
 - **영역에 색이 안 뜸** → 기간(`시작일`/`종료일`)에 맑은 영상이 없을 수 있음. 기간을 넓혀보세요.
-- **`add_colorbar` 가 없다는 에러** → geemap 버전이 낮은 경우. `pip install -U geemap` 로 올려보세요.
+- **범례(컬러바)가 안 보임** → `pip install folium streamlit-folium` 확인 (branca는 folium에 포함).
 - 그 외 에러는 메시지를 복사해 Claude Code에게 물어보세요.
 
 > 코드 검증 메모: NDVI 식(`normalizedDifference(["B8","B4"])`)과 팔레트·min/max는 참고 프로젝트 `dkidi/collector/ee_ndvi.py`의 실제 패턴(`add_ndvi`에서 `normalizedDifference(["B8","B4"]).rename("NDVI")`)에 근거합니다.

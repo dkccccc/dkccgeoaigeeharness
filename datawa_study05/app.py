@@ -27,10 +27,12 @@ batch_change_detection 은 '혼자 차례로' 도는 loop 방식입니다(가장
 
 import json
 
+import branca.colormap as bcm
 import ee
-import geemap.foliumap as geemap   # streamlit 안에서는 folium 백엔드를 써야 지도가 뜸
+import folium
 import pandas as pd
 import streamlit as st
+from streamlit_folium import st_folium
 
 
 # =====================================================================
@@ -49,6 +51,19 @@ def init_ee():
         # 토큰이 없으면(예: 클라우드 첫 실행) 인증을 시도해 본다.
         ee.Authenticate()
         ee.Initialize()
+
+
+# GEE 이미지를 folium 지도에 올리는 헬퍼 (0장과 동일)
+# ee 이미지를 '타일 URL'로 바꿔(getMapId) folium 타일 레이어로 추가한다.
+def add_ee_layer(fmap, ee_image, vis, name):
+    mapid = ee_image.getMapId(vis)
+    folium.TileLayer(
+        tiles=mapid["tile_fetcher"].url_format,
+        attr="Google Earth Engine",
+        name=name,
+        overlay=True,
+        control=True,
+    ).add_to(fmap)
 
 
 # =====================================================================
@@ -340,13 +355,16 @@ if mode == "한 지역":
                   delta_color="inverse")
         c4.metric("식생 증가", f"{result['increase_ratio']:.1f} %", delta="+회복·생장")
 
-        # (2) 변화 지도 — geemap.foliumap 으로 그려야 streamlit 안에 임베드됩니다.
+        # (2) 변화 지도 — folium(Leaflet) 으로 그려 streamlit 안에 임베드합니다.
         st.subheader("🗺️ 변화 지도  (빨강=감소 · 초록=증가)")
-        m = geemap.Map()
-        m.add_layer(result["image"], VIS, "NDVI 변화")
-        m.center_object(result["roi"])
-        m.add_colorbar(VIS, label="NDVI 변화량 (- 감소 / + 증가)")
-        m.to_streamlit(height=520)
+        m = folium.Map(location=[lat, lon], zoom_start=12)
+        add_ee_layer(m, result["image"], VIS, "NDVI 변화")
+        bcm.LinearColormap(
+            colors=VIS["palette"], vmin=VIS["min"], vmax=VIS["max"],
+            caption="NDVI 변화량 (- 감소 / + 증가)",
+        ).add_to(m)
+        folium.LayerControl().add_to(m)
+        st_folium(m, width=None, height=520, returned_objects=[])
 
         # (3) 통계 내려받기
         stats = {k: v for k, v in result.items() if k not in ("image", "roi")}
